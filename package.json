@@ -1,4 +1,15 @@
 {
+  "name": "vue-springbud",
+  "description": "vue / webpack startting template with multi entries & multi chunks",
+  "version": "1.0.0",
+  "repository": "https://github.com/doodlewind/vue-springbud",
+  "author": "doodlewind",
+  "license": "MIT",
+  "keywords": [
+    "vue",
+    "webpack",
+    "scaffold"
+  ],
   "scripts": {
     "dev": "node build/dev.js",
     "prod": "node build/prod.js",
