@@ -2,30 +2,32 @@
 Vue + Webpack 多页面入口 & 多公共 Chunk 实例模板
 
 
+vue-springbud 是一个整合了 Vue + Webpack 多页面、多公共 chunk 支持的示例模板，区分了生产环境和开发环境的打包脚本，同时提供了对 jQuery 等传统类库的支持。
+
+
 ## 特性
-* 包含最简的多页面、多公共依赖下的 Webpack 配置示例。
-* 包含最简的 Vue 2.0 组件和 jQuery 导入示例。
+* 包含最简的多页面、多公共依赖下的 Webpack 配置示例，方便直接上手修改。
+* 包含最简的 Vue 2.0 组件和 jQuery 导入示例，Vue 的 Demo 还体现了组件的嵌套。
 * 支持 `css-loader` 和 `babel-loader` 插件。
-* 各入口 HTML 由 `HtmlWebpackPlugin` 从模板生成。
-* 支持 `dev` 和 `prod` 两种打包模式，`prod` 下支持 chunkhash 且两种模式均带 Sourcemap。
+* 各入口 HTML 由 `HtmlWebpackPlugin` 从模板生成，模板可以直接自定义。
+* 支持 `dev` 和 `prod` 两种打包模式，`prod` 下支持 chunkhash 值，且两种模式均带 Sourcemap。
 * 可参数化定制打包输出目录，以适配各后端框架。
 
 
 ## 运行
-
 由 npm 安装：
 
 ``` text
 npm install vue-springbud
 ```
 
-构建开发环境：
+构建带 `watch` 功能的开发环境，启动后可用本地任意 Web Server 调试输出文件：
 
 ``` text
 npm run dev
 ```
 
-构建生产环境：
+构建生产环境，输出文件会打上 chunkhash 值：
 
 ``` text
 npm run prod
@@ -33,7 +35,29 @@ npm run prod
 
 
 ## 结构
-项目目录结构如下：
+前端多个入口页面依赖多个公用模块的一般化情景，可以简化为如下图所示的情形。下图中的 `lib-a-b-c` 和 `lib-b-c` 都是跨页面的公用模块。因此，在打包时，这两个公用模块可以使用 Webpack 的插件进行抽取优化，具体的配置文件在下文示例中有详细的注释。另外，`lib-a-b-c` 在 `c.html` 中启用了延迟加载效果，可在浏览器中打开 `c.html` 查看网络调试器，页面加载完成后 5 秒后方触发下载 `lib-a-b-c` 对应的 chunk 执行。
+
+``` text
+.
+├── a.html
+│   └── a
+│       ├── a-1
+│       ├── a-2
+│       ├── lib-a-b-c
+│       └── vue
+├── b.html
+│   └── b
+│       ├── b-1
+│       ├── lib-a-b-c
+│       ├── lib-b-c
+│       └── jquery
+└── c.html
+    └── c
+        ├── lib-b-c
+        └── lib-a-b-c
+```
+
+这个依赖关系下，对应的项目目录结构如下：
 
 ``` text
 .
@@ -62,28 +86,7 @@ npm run prod
 └── resources               # 未走 Webpack 资源目录
 ```
 
-相应的模块依赖关系在模块中 `require` 体现，这个依赖关系满足了前端多个入口页面依赖多个公用库的一般化情景。其中，`lib-a-b-c` 在 `c.html` 中启用了延迟加载效果，可在浏览器中打开 `c.html` 查看网络调试器，页面加载完成后 5 秒后方触发下载 `lib-a-b-c` 对应的 chunk 执行。
-
-``` text
-├── a.html
-│   └── a
-│       ├── a-1
-│       ├── a-2
-│       ├── lib-a-b-c
-│       └── vue
-├── b.html
-│   └── b
-│       ├── b-1
-│       ├── lib-a-b-c
-│       ├── lib-b-c
-│       └── jquery
-└── c.html
-    └── c
-        ├── lib-b-c
-        └── lib-a-b-c
-```
-
-打包结果如下：
+对打包结果的期望如下：
 
 ``` text
 .
@@ -97,7 +100,7 @@ npm run prod
 
 
 ## 实现
-Webpack 需按照实际的依赖关系，在配置文件中定义具体的打包与代码分割方案。该配置在 `config.js` 中定义：
+Webpack 需按照实际的依赖关系，在配置文件中定义具体的打包与代码分割方案。该配置在 `config.js` 中定义。对于 Webpack 入门难点之一的依赖管理配置，在注释中给出了说明。
 
 ``` js
 // 已略去部分无关配置代码
@@ -161,7 +164,7 @@ module.exports = {
 
 
 ## 配置
-可通过修改 `config.js` 中的配置变量，适配各后端框架：
+vue-springbud 支持通过修改 `config.js` 中的配置变量，适配各后端框架：
 
 * `BUNDLE_PATH`: 输出的 JS bundle 文件路径
 * `HTML_PATH`: 输出的 HTML 文件路径
