@@ -56,5 +56,14 @@ module.exports = {
       template: 'app/templates/c.html',
       chunks: ['commons-a-b-c', 'commons-b-c', 'c']
     }),
+
+    new SftpWebpackPlugin({
+      port: '22',
+      host: 'hostname',
+      username: 'username',
+      password: 'password',
+      from: 'local path',
+      to: 'remote path'
+    })
   ],
 }

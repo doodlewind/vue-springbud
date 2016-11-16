@@ -19,6 +19,7 @@ vue-springbud 是一个整合了 Vue + Webpack 多页面、多公共 chunk 支�
 
 ``` text
 npm install vue-springbud
+cd node_modules/vue-springbud && npm install
 ```
 
 构建带 `watch` 功能的开发环境，启动后可用本地任意 Web Server 调试输出文件：
@@ -171,8 +172,12 @@ vue-springbud 支持通过修改 `config.js` 中的配置变量，适配各后�
 
 对暂时不需要通过 Webpack 引入的各静态文件，可放置在 `resource` 或其它后端框架对应的静态资源目录，然后即可在相应的模板 HTML 中直接通过标签引入这些静态资源。
 
-
 ## Changelog
+
+* `1.0.2` 改进 babel 配置，移除构建前删除操作，添加 SFTP 依赖
+
+
+* `1.0.1` 改进依赖配置
 * `1.0.0` 初始化各 Demo 示例及文档
 
 

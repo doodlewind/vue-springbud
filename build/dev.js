@@ -8,7 +8,7 @@ conf.debug = true;
 conf.devtool = "cheap-eval-source-map";
 conf.watch = true;
 
-del.sync([bundlePath + '/*']);
+// del.sync([bundlePath + '/*']);
 webpack(conf, function(err, stats) {
   if (err) throw err;
   console.log(stats.toString({

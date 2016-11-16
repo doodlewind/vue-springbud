@@ -3,7 +3,8 @@ var conf = require('./webpack.base.conf');
 var del = require('del');
 var webpack = require("webpack");
 
-conf.output.filename = "[name].[chunkhash].bundle.js";
+// conf.output.filename = "[name].[chunkhash].bundle.js";
+conf.output.filename = "[name].bundle.js";
 conf.debug = true;
 conf.devtool = "source-map";
 conf.plugins = conf.plugins.concat([
@@ -11,10 +12,14 @@ conf.plugins = conf.plugins.concat([
     "process.env": { "NODE_ENV": JSON.stringify("production") }
   }),
   new webpack.optimize.DedupePlugin(),
-  new webpack.optimize.UglifyJsPlugin()
+  new webpack.optimize.UglifyJsPlugin({
+    compress: {
+      warnings: false
+    }
+  })
 ]);
 
-del.sync([bundlePath + '/*']);
+// del.sync([bundlePath + '/*']);
 webpack(conf, function(err, stats) {
   if (err) throw err;
   console.log(stats.toString({
