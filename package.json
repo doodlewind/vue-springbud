@@ -28,6 +28,7 @@
     "html-webpack-plugin": "^2.22.0",
     "node-sass": "^3.10.1",
     "sass-loader": "^4.0.2",
+    "sftp-webpack-plugin": "^0.2.3",
     "vue-loader": "^9.5.1",
     "vue-style-loader": "^1.0.0",
     "webpack": "^1.13.2"
