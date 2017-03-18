@@ -1,185 +1,132 @@
 # vue-springbud
-Vue + Webpack 多页面入口 & 多公共 Chunk 实例模板
+Vue 生产环境模板，默认支持特性包括：
 
-
-vue-springbud 是一个整合了 Vue + Webpack 多页面、多公共 chunk 支持的示例模板，区分了生产环境和开发环境的打包脚本，同时提供了对 jQuery 等传统类库的支持。
-
-
-## 特性
-* 包含最简的多页面、多公共依赖下的 Webpack 配置示例，方便直接上手修改。
-* 包含最简的 Vue 2.0 组件和 jQuery 导入示例，Vue 的 Demo 还体现了组件的嵌套。
-* 支持 `css-loader` 和 `babel-loader` 插件。
-* 各入口 HTML 由 `HtmlWebpackPlugin` 从模板生成，模板可以直接自定义。
-* 支持 `dev` 和 `prod` 两种打包模式，`prod` 下支持 chunkhash 值，且两种模式均带 Sourcemap。
-* 可参数化定制打包输出目录，以适配各后端框架。
+* 热重载
+* 公共依赖提取
+* 多入口 HTML 注入
+* 反向代理
+* 内联图片
+* Stylus 支持
+* CSS 提取
 
 
 ## 运行
-由 npm 安装：
+安装依赖：
 
 ``` text
-npm install vue-springbud
-cd node_modules/vue-springbud && npm install
+yarn install
 ```
 
-构建带 `watch` 功能的开发环境，启动后可用本地任意 Web Server 调试输出文件：
+运行开发模式，将监听文件变更并写入打包文件到磁盘：
 
 ``` text
-npm run dev
+yarn run dev
 ```
 
-构建生产环境，输出文件会打上 chunkhash 值：
+运行带 dev-server 的开发模式，默认启动本地于 `localhost:9000` 并监听文件变更。该模式下打包文件写入内存：
 
 ``` text
-npm run prod
-```
-
-
-## 结构
-前端多个入口页面依赖多个公用模块的一般化情景，可以简化为如下图所示的情形。下图中的 `lib-a-b-c` 和 `lib-b-c` 都是跨页面的公用模块。因此，在打包时，这两个公用模块可以使用 Webpack 的插件进行抽取优化，具体的配置文件在下文示例中有详细的注释。另外，`lib-a-b-c` 在 `c.html` 中启用了延迟加载效果，可在浏览器中打开 `c.html` 查看网络调试器，页面加载完成后 5 秒后方触发下载 `lib-a-b-c` 对应的 chunk 执行。
-
-``` text
-.
-├── a.html
-│   └── a
-│       ├── a-1
-│       ├── a-2
-│       ├── lib-a-b-c
-│       └── vue
-├── b.html
-│   └── b
-│       ├── b-1
-│       ├── lib-a-b-c
-│       ├── lib-b-c
-│       └── jquery
-└── c.html
-    └── c
-        ├── lib-b-c
-        └── lib-a-b-c
-```
-
-这个依赖关系下，对应的项目目录结构如下：
-
-``` text
-.
-├── README.md
-├── app
-│   ├── a.js                # 页面 A 入口
-│   ├── b.js                # 页面 B 入口
-│   ├── c.js                # 页面 C 入口
-│   ├── components
-│   │   ├── App.vue         # Vue 父组件
-│   │   └── Child.vue       # Vue 子组件
-│   ├── modules
-│   │   ├── a-1.js          # 页面 A 依赖 1
-│   │   ├── a-2.js          # 页面 A 依赖 2
-│   │   ├── b-1.js          # 页面 B 依赖
-│   │   ├── lib-a-b-c.js    # 页面 A/B/C 公共依赖
-│   │   └── lib-b-c.js      # 页面 B/C 公共依赖
-│   └── templates
-│       ├── a.html          # 页面 A HTML 模板
-│       ├── b.html          # 页面 B HTML 模板
-│       └── c.html          # 页面 C HTML 模板
-├── dist                    # bundle 输出目录
-├── html                    # HTML 输出目录
-├── node_modules
-├── package.json
-└── resources               # 未走 Webpack 资源目录
-```
-
-对打包结果的期望如下：
-
-``` text
-.
-├── 3.chunk.js                # C 的延迟加载 chunk
-├── a.bundle.js               # A entry chunk
-├── b.bundle.js               # B entry chunk
-├── c.bundle.js               # C entry chunk
-├── commons-a-b-c.bundle.js   # A/B/C 公共 chunk
-└── commons-b-c.bundle.js     # B/C 公共 chunk
+yarn run dev-server
 ```
 
 
-## 实现
-Webpack 需按照实际的依赖关系，在配置文件中定义具体的打包与代码分割方案。该配置在 `config.js` 中定义。对于 Webpack 入门难点之一的依赖管理配置，在注释中给出了说明。
+运行生产模式，将压缩文件、分离 CSS 并添加 hash 值：
+
+``` text
+yarn run prod
+```
+
+
+## 默认配置策略
+可修改 `build/config.js` 配置文件以定制相关参数。
+
+### 输入
+页面入口 JS 文件位于 `src` 路径下，相应 HTML 模板与其同名，位于 `src/templates` 路径下。`src` 目录结构如下：
+
+``` text
+├── index.js             # Webpack 入口 JS
+├── App.vue              # Vue 入口组件
+├── assets               # 图片 / 字体等静态资源
+│   └── logo.png
+├── components           # 页面 .vue 组件与各页面 JS
+│   └── Hello.vue
+├── styl                 # 公用样式
+│   ├── mixins.styl
+│   └── variables.styl
+└── templates            # 用于注入页面 JS 的 HTML 模板
+    └── index.html
+```
+
+### 输出
+模板默认将 JS 文件输出至 `dist` 路径下，生成的 HTML 文件输出至 `pages` 目录下。`run prod` 时，将提取 CSS 文件至 `dist/css` 路径下。小于 15K 的图片将内联至 JS，不需拼接雪碧图。
+
+默认输出 JS 包为 index / vendor / manifest 三个。其中 manifest 包用于存放对接 index 和 vendor 的 Webpack 相关模块加载代码，使得等业务模块变更时，只变动内容较小的 manifest 而无需更新第三方库 `vendor` 文件。
+
+
+## 自定义配置指南
+处理常见开发需求的配置方式如下：
+
+### 更改输出路径
+需对接不同后端框架时，可将输出的 JS 和 HTML 路径更改为后端框架的相应路径。若后端静态资源目录为 `resources`，HTML View 目录为 `applications/view`，线上路径为 `http://demo.com/foo/bar/resources/bundle.js`，相应配置可修改为：
 
 ``` js
-// 已略去部分无关配置代码
-module.exports = {
-  // 按照页面数量，声明多个入口
-  entry: {
-    a: "./app/a",
-    b: "./app/b",
-    c: "./app/c"
-  },
-  plugins: [
-    // 将 jQuery 作为全局依赖引入
-    // 在打包时发现 $ 的块会在全局作用域打入 jQuery
-    // 该方法不支持延时按需加载
-    // 若需要延迟加载 jQuery，则需要按照 require.ensure 引入 jQuery
-    new ProvidePlugin({
-      $: 'jquery'
-    }),
+var bundlePath = path.join(process.cwd(), './resources')
+var htmlPath = path.join(process.cwd(), './applications/view')
+// ...
+output: {
+  publicPath: '/foo/bar/resources/'
+}
+```
 
-    // 代码分隔配置
-    // CommonsChunkPlugin 合并处理的最小单位是 chunks 而非单个模块
-    new CommonsChunkPlugin({
-      // 抽取 b 和 c 两个 entry chunk 的公用依赖到 commons-b-c
-      name: "commons-b-c",
-      // 使用 entry 中的 key 引用 chunk，而非文件名或模块名
-      chunks: ["b", "c"]
-    }),
-    // 注意抽取依赖的执行顺序
-    // 需先抽取 b 和 c 后，将结果返回给抽取 a/b/c 的 CommonsChunkPlugin
-    // 即在提取 abc 三者的公用 chunk 时，不能再次引入 b 和 c
-    // 需从已经抽取了 b 和 c 公用依赖的 commons-b-c 引入
-    new CommonsChunkPlugin({
-      name: "commons-a-b-c",
-      // 从 commons-b-c 引入 b 和 c
-      chunks: ["a", "commons-b-c"]
-    }),
+### 多入口文件
+目前已有 index 页面，需新建 foo 页面时，先修改配置文件的 `entry` 部分如下：
 
-    // 生成供后端框架渲染的 HTML 文件
-    new HtmlWebpackPlugin({
-      // 输出文件名
-      filename: path.join(HTML_PATH, 'a.html'),
-      // 模板路径
-      template: 'app/templates/a.html',
-      // 注入的 chunk 名，chunk 将作为 <script> 标签注入到模板 <body> 尾部
-      // 注意顺序与实际依赖关系有关
-      chunks: ['commons-a-b-c', 'a']
-    }),
-    new HtmlWebpackPlugin({
-      filename: path.join(HTML_PATH, 'b.html'),
-      template: 'app/templates/b.html',
-      chunks: ['commons-a-b-c', 'commons-b-c', 'b']
-    }),
-    new HtmlWebpackPlugin({
-      filename: path.join(HTML_PATH, 'c.html'),
-      template: 'app/templates/c.html',
-      chunks: ['commons-a-b-c', 'commons-b-c', 'c']
-    }),
-  ],
+``` js
+var entry = {
+  index: './src/index.js',
+  foo: './src/foo.js',
+  vendor: ['vue']
+}
+```
+然后新建 `src/foo.js` 与 `src/templates/foo.html` 并重启 webpack 即可。
+
+### 合并多个公共依赖库
+默认将 Vue 作为唯一的第三方依赖打包至 `vendor.bundle.js`。若页面有多个第三方库，可在 `entry` 中指定需要抽取至 `vendor` 中合并的第三方库名：
+
+``` js
+var entry = {
+  index: './src/index.js',
+  foo: './src/foo.js',
+  vendor: ['vue', 'chart.js', 'vue-router'] // ...
+}
+```
+
+### 引入 CSS
+模板已配置根路径为 `src` 与 `node_modules`，可通过绝对路径引入相应位置下的 CSS 文件：
+
+``` css
+/* 引入 src/styl/foo.css */
+@import '~styl/foo.css';
+
+/* 引入 yarn install 的第三方 CSS 库 */
+@import '~normalize.css';
+```
+
+### 反向代理后端接口
+可通过 devServer 反向代理后端接口 API，从而无需在本地搭建后端环境或上传文件到测试环境。修改 `module.exports.devServer` 下的 `proxy` 参数即可：
+
+``` js
+{
+  // ...
+  proxy: {
+    '/api': { target: 'http://backend-address/' }
+  }
 }
 ```
 
 
-## 配置
-vue-springbud 支持通过修改 `config.js` 中的配置变量，适配各后端框架：
+关于 Webpack 2 的更多常用配置，可参见 [Webpack Configuration](https://webpack.js.org/configuration/)
 
-* `BUNDLE_PATH`: 输出的 JS bundle 文件路径
-* `HTML_PATH`: 输出的 HTML 文件路径
-
-对暂时不需要通过 Webpack 引入的各静态文件，可放置在 `resource` 或其它后端框架对应的静态资源目录，然后即可在相应的模板 HTML 中直接通过标签引入这些静态资源。
 
 ## Changelog
-
-* `1.0.2` 改进 babel 配置，移除构建前删除操作，添加 SFTP 依赖
-
-
-* `1.0.1` 改进依赖配置
-* `1.0.0` 初始化各 Demo 示例及文档
-
-
-## 许可
-MIT
+* `0.1.0` 升级到 Webpack 2 并重写配置文件及目录结构

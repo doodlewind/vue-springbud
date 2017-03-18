@@ -1,31 +1,38 @@
-module.exports = {
-  cssLoaders: function(options) {
-    options = options || {}
-    // generate loader string to be used with extract text plugin
-    function generateLoaders (loaders) {
-      var sourceLoader = loaders.map(function (loader) {
-        var extraParamChar
-        if (/\?/.test(loader)) {
-          loader = loader.replace(/\?/, '-loader?')
-          extraParamChar = '&'
-        } else {
-          loader = loader + '-loader'
-          extraParamChar = '?'
-        }
-        return loader + (options.sourceMap ? extraParamChar + 'sourceMap' : '')
-      }).join('!')
+var path = require('path')
+var HtmlWebpackPlugin = require('html-webpack-plugin')
+var ExtractTextPlugin = require('extract-text-webpack-plugin')
 
-      return ['vue-style-loader', sourceLoader].join('!')
+module.exports = {
+  generateTemplates: function (entry, htmlPath, isProduction) {
+    var plugins = []
+    Object.keys(entry).map(function (entryName) {
+      if (entryName !== 'vendor') {
+        let htmlName = entryName + '.html'
+        plugins.push(new HtmlWebpackPlugin({
+          hash: isProduction,
+          filename: path.join(htmlPath, htmlName),
+          template: 'src/templates/' + htmlName,
+          chunks: ['manifest', 'vendor', entryName]
+        }))
+      }
+    })
+    return plugins
+  },
+  getStyleLoaders: function (isProduction) {
+    if (!isProduction) {
+      return {
+        styl: 'vue-style-loader!css-loader!stylus-loader'
+      }
     }
-    // http://vuejs.github.io/vue-loader/configurations/extract-css.html
     return {
-      css: generateLoaders(['css']),
-      postcss: generateLoaders(['css']),
-      less: generateLoaders(['css', 'less']),
-      sass: generateLoaders(['css', 'sass?indentedSyntax']),
-      scss: generateLoaders(['css', 'sass']),
-      stylus: generateLoaders(['css', 'stylus']),
-      styl: generateLoaders(['css', 'stylus'])
+      styl: ExtractTextPlugin.extract({
+        use: ['css-loader', 'stylus-loader'],
+        fallback: 'vue-style-loader'
+      }),
+      css: ExtractTextPlugin.extract({
+        use: 'css-loader',
+        fallback: 'vue-style-loader'
+      })
     }
   }
 }

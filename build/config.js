@@ -1,69 +1,90 @@
-var path = require('path');
-var ProvidePlugin = require("webpack").ProvidePlugin;
-var CommonsChunkPlugin = require("webpack").optimize.CommonsChunkPlugin;
-var HtmlWebpackPlugin = require("html-webpack-plugin");
+var path = require('path')
+var webpack = require('webpack')
+var ExtractTextPlugin = require('extract-text-webpack-plugin')
+var rm = require('rimraf')
+var utils = require('./utils')
 
+var isProduction = process.env.NODE_ENV === 'production'
+var bundlePath = path.join(process.cwd(), './dist')
+var htmlPath = path.join(process.cwd(), './pages')
 
-var BUNDLE_PATH = "dist";
-var HTML_PATH = path.join(process.cwd(), "html");
-
+// 需新建 foo 页面时，在此添加 foo: './src/foo.js'
+// 并新建 src/foo.js 与 src/templates/foo.html
+var entry = {
+  index: './src/index.js',
+  vendor: ['vue']
+}
 
 module.exports = {
-  bundlePath: BUNDLE_PATH,
-  entry: {
-    a: "./app/a",
-    b: "./app/b",
-    c: "./app/c"
-  },
+  entry: entry,
   output: {
-    // npm script always runs from project root
-    path: path.join(process.cwd(), BUNDLE_PATH),
-    filename: "[name].bundle.js",
-    chunkFilename: "[id].chunk.js",
-    publicPath: "/" + BUNDLE_PATH + "/"
+    filename: '[name].bundle.js',
+    path: bundlePath,
+    publicPath: '/dist/'
   },
   plugins: [
-    // global dependency
-    new ProvidePlugin({
-      $: 'jquery'
+    new ExtractTextPlugin({
+      filename: 'css/[name].[contenthash].css'
     }),
-
-    // code splitting
-    new CommonsChunkPlugin({
-      name: "commons-b-c",
-      // use entry names, not filename or module name
-      chunks: ["b", "c"]
-    }),
-    new CommonsChunkPlugin({
-      name: "commons-a-b-c",
-      // load b and c from previous common chunk
-      chunks: ["a", "commons-b-c"]
-    }),
-
-    // generate entry HTML
-    new HtmlWebpackPlugin({
-      filename: path.join(HTML_PATH, 'a.html'),
-      template: 'app/templates/a.html',
-      chunks: ['commons-a-b-c', 'a']
-    }),
-    new HtmlWebpackPlugin({
-      filename: path.join(HTML_PATH, 'b.html'),
-      template: 'app/templates/b.html',
-      chunks: ['commons-a-b-c', 'commons-b-c', 'b']
-    }),
-    new HtmlWebpackPlugin({
-      filename: path.join(HTML_PATH, 'c.html'),
-      template: 'app/templates/c.html',
-      chunks: ['commons-a-b-c', 'commons-b-c', 'c']
-    }),
-
-    new SftpWebpackPlugin({
-      port: '22',
-      host: 'hostname',
-      username: 'username',
-      password: 'password',
-      from: 'local path',
-      to: 'remote path'
+    new webpack.optimize.CommonsChunkPlugin({
+      names: ['vendor', 'manifest']
     })
-  ],
+  ].concat(utils.generateTemplates(entry, htmlPath, isProduction)),
+  module: {
+    rules: [
+      {
+        test: /\.vue$/,
+        loader: 'vue-loader',
+        options: {
+          loaders: utils.getStyleLoaders(isProduction)
+        }
+      },
+      {
+        test: /\.js$/,
+        loader: 'babel-loader',
+        exclude: /node_modules/
+      },
+      {
+        test: /\.(png|jpg|gif|svg)$/,
+        loader: 'url-loader',
+        options: {
+          limit: 15000,
+          name: 'img/[name].[ext]?[hash]'
+        }
+      }
+    ]
+  },
+  resolve: {
+    extensions: ['.js', '.vue', '.styl'],
+    modules: [path.join(process.cwd(), './src'), 'node_modules'],
+    alias: { 'vue$': 'vue/dist/vue.runtime.js' }
+  },
+  performance: { hints: false },
+  devtool: '#eval-source-map',
+  devServer: {
+    contentBase: path.join(process.cwd(), './pages'),
+    compress: true,
+    port: 9000,
+    noInfo: true,
+    // 代理后端接口
+    proxy: {
+      // '/api': { target: 'http://backend-address/' }
+    }
+  }
+}
+
+rm.sync(path.join(bundlePath, './*'))
+if (isProduction) {
+  module.exports.devtool = '#source-map'
+  module.exports.output.filename = '[name].[hash].bundle.js'
+  module.exports.plugins = module.exports.plugins.concat([
+    new webpack.DefinePlugin({
+      'process.env': { NODE_ENV: '"production"' }
+    }),
+    new webpack.optimize.UglifyJsPlugin({
+      sourceMap: true,
+      compress: { warnings: false }
+    }),
+    new webpack.LoaderOptionsPlugin({ minimize: true })
+  ])
 }
