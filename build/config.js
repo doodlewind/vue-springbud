@@ -57,7 +57,7 @@ module.exports = {
   resolve: {
     extensions: ['.js', '.vue', '.styl'],
     modules: [path.join(process.cwd(), './src'), 'node_modules'],
-    alias: { 'vue$': 'vue/dist/vue.esm.js' }
+    alias: { 'vue$': 'vue/dist/vue.runtime.js' }
   },
   performance: { hints: false },
   devtool: '#eval-source-map',

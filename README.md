@@ -129,4 +129,5 @@ var entry = {
 
 
 ## Changelog
+* `0.1.1` 修复 vue runtime 包问题
 * `0.1.0` 升级到 Webpack 2 并重写配置文件及目录结构
