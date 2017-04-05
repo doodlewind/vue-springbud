@@ -16,16 +16,13 @@ export default {
 }
 </script>
 
-<style lang="styl">
-@import "~styl/mixins";
-@import "~styl/variables";
+<style lang="stylus">
+@import "~styl/mixins"
 
-* {
-  font-family: 'Helvetica Neue', 'Helvetica', Arial, 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
-  box-sizing: border-box;
-}
-#app {
-  margin-top: 60px;
-  flex-align(center, center);
-}
+*
+  font-family: 'Helvetica Neue', 'Helvetica', Arial, 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif
+  box-sizing: border-box
+#app
+  margin-top: 60px
+  flex-align(center, center)
 </style>

@@ -16,11 +16,9 @@ export default {
 }
 </script>
 
-<style lang="styl" scoped>
-@import "~styl/mixins";
-@import "~styl/variables";
+<style lang="stylus" scoped>
+@import "~styl/mixins"
 
-.hello {
-  color: color-main;
-}
+.hello
+  color: color-main
 </style>
