@@ -76,7 +76,7 @@ module.exports = {
 rm.sync(path.join(bundlePath, './*'))
 if (isProduction) {
   module.exports.devtool = '#source-map'
-  module.exports.output.filename = '[name].[hash].bundle.js'
+  module.exports.output.filename = '[name].[chunkhash].bundle.js'
   module.exports.plugins = module.exports.plugins.concat([
     new webpack.DefinePlugin({
       'process.env': { NODE_ENV: '"production"' }
