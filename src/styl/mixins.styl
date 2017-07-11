@@ -1,14 +1,14 @@
 @import "./variables"
 
 // 水平与竖直方向不同对齐方式的容器
-flex-align(horizontal, vertical)
-  display: flex
-  justify-content: horizontal
-  align-items: vertical
+flex-align($horizontal, $vertical)
+  display: $flex
+  justify-content: $horizontal
+  align-items: $vertical
 
 // 定高且文字水平竖直均居中的 div
-center-text-div(container-height, font-size)
-  height: container-height
-  line-height: container-height
-  font-size: font-size
+center-text-div($container-height, $font-size)
+  height: $container-height
+  line-height: $container-height
+  font-size: $font-size
   vertical-align: middle

@@ -20,5 +20,5 @@ export default {
 @import "~styl/mixins"
 
 .hello
-  color: color-main
+  color: $color-main
 </style>

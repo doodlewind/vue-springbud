@@ -14,26 +14,26 @@ Vue 生产环境模板，默认支持特性包括：
 安装依赖：
 
 ``` text
-yarn install
+npm install
 ```
 
 运行开发模式，将监听文件变更并写入打包文件到磁盘：
 
 ``` text
-yarn run dev
+npm run dev-local
 ```
 
 运行带 dev-server 的开发模式，默认启动本地于 `localhost:9000` 并监听文件变更。该模式下打包文件写入内存：
 
 ``` text
-yarn run dev-server
+npm run dev
 ```
 
 
 运行生产模式，将压缩文件、分离 CSS 并添加 hash 值：
 
 ``` text
-yarn run prod
+npm run build
 ```
 
 
@@ -88,7 +88,7 @@ var entry = {
   vendor: ['vue']
 }
 ```
-然后新建 `src/foo.js` 与 `src/templates/foo.html` 并重启 webpack 即可。
+而后新建 `src/foo.js` 与 `src/templates/foo.html` 并重启 webpack 即可。
 
 ### 合并多个公共依赖库
 默认将 Vue 作为唯一的第三方依赖打包至 `vendor.bundle.js`。若页面有多个第三方库，可在 `entry` 中指定需要抽取至 `vendor` 中合并的第三方库名：
@@ -101,14 +101,14 @@ var entry = {
 }
 ```
 
-### 引入 CSS
+### 导入 CSS
 模板已配置根路径为 `src` 与 `node_modules`，可通过绝对路径引入相应位置下的 CSS 文件：
 
 ``` css
-/* 引入 src/styl/foo.css */
+/* 导入 src/styl/foo.css */
 @import '~styl/foo.css';
 
-/* 引入 yarn install 的第三方 CSS 库 */
+/* 导入 npm install 的第三方 CSS 库 */
 @import '~normalize.css';
 ```
 
@@ -124,11 +124,19 @@ var entry = {
 }
 ```
 
+### 原生 JS 项目
+若不需使用 Vue 时，可将本模板用于测试性开发原生 JS 项目。此时若更改 `templates/index.html` 入口模板后，需重启打包命令才会重新生成新的 `pages/index.html` 入口页。
 
-关于 Webpack 2 的更多常用配置，可参见 [Webpack Configuration](https://webpack.js.org/configuration/)
+关于 Webpack 的更多常用配置，可参见 [Webpack Configuration](https://webpack.js.org/configuration/)
 
 
 ## Changelog
+* `0.2.0`
+    * 添加原生 CSS 导入支持
+    * 优化默认 stylus 风格
+    * 移除 Yarn
+    * 优化默认打包命令
+    * 文档添加原生 JS 支持备注
 * `0.1.2` 修复 stylus 抽取 CSS 问题
 * `0.1.1` 修复 vue runtime 包问题
 * `0.1.0` 升级到 Webpack 2 并重写配置文件及目录结构
