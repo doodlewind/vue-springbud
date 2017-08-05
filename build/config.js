@@ -1,22 +1,22 @@
-var path = require('path')
-var webpack = require('webpack')
-var ExtractTextPlugin = require('extract-text-webpack-plugin')
-var rm = require('rimraf')
-var utils = require('./utils')
+const path = require('path')
+const webpack = require('webpack')
+const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const rm = require('rimraf')
+const utils = require('./utils')
 
-var isProduction = process.env.NODE_ENV === 'production'
-var bundlePath = path.join(process.cwd(), './dist')
-var htmlPath = path.join(process.cwd(), './pages')
+const isProduction = process.env.NODE_ENV === 'production'
+const bundlePath = path.join(process.cwd(), './dist')
+const htmlPath = path.join(process.cwd(), './pages')
 
 // 需新建 foo 页面时，在此添加 foo: './src/foo.js'
 // 并新建 src/foo.js 与 src/templates/foo.html
-var entry = {
+const entry = {
   index: './src/index.js',
   vendor: ['vue']
 }
 
 module.exports = {
-  entry: entry,
+  entry,
   output: {
     filename: '[name].bundle.js',
     path: bundlePath,
@@ -63,6 +63,8 @@ module.exports = {
   performance: { hints: false },
   devtool: '#eval-source-map',
   devServer: {
+    disableHostCheck: true,
+    host: '0.0.0.0',
     contentBase: path.join(process.cwd(), './pages'),
     compress: true,
     port: 9000,
