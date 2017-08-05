@@ -131,6 +131,9 @@ var entry = {
 
 
 ## Changelog
+* `0.2.1`
+    * 配置文件升级 ES6
+    * 允许 dev server 由外部设备访问
 * `0.2.0`
     * 添加原生 CSS 导入支持
     * 优化默认 stylus 风格
